@@ -1,0 +1,25 @@
+server: 
+  port: 3344 
+  
+spring:
+  application:
+    name:  parkingsoftware-config
+  cloud:
+    config:
+      server:
+        git:
+          uri: git@github.com:qiangxiaox/parkingsoftware.git #GitHub上面的对应仓库的ssh路径
+          search-paths: application-configfile,application-configfile/back,application-configfile/front #github仓库路径下的搜索路径，可以配置多个
+    bus:
+      trace:
+        enabled: true #开启消息跟踪
+
+  rabbitmq:
+     host: localhost
+     port: 5672
+     username: springcloud
+     password: springcloud
+
+management:
+  security:
+    enabled: false
