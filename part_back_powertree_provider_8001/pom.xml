@@ -52,7 +52,7 @@
         <!--api依赖-->
         <dependency>
             <groupId>com.jk</groupId>
-            <artifactId>bbs_back_service_api</artifactId>
+            <artifactId>shop_back_service_api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!--陈教授版的分页处理启动器-->

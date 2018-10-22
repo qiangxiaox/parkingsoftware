@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ <mapper namespace="com.jk.springcloud.dao.IAdminUserDAO">
+
+    <!-- 是进行登录认证使用的，即，根据身份信息取出密码进行认证 -->
+    <select id="findById" parameterType="String" resultType="com.jk.resource.model.AdminUser">
+         SELECT * FROM member WHERE mid=#{username}
+    </select>
+
+    <!-- 根据用户名查询出该用户对应的所有角色的标记名称（千万不要用中文） -->
+    <select id="findAllRoleByMember" parameterType="String" resultType="com.jk.resource.model.Role">
+        select * from  es_role where roleid in (
+                  select roleid from es_user_role  where userid=#{userid}
+           )
+    </select>
+
+
+    <!-- 查询出一个用户对应的所有权限数据 -->
+    <select id="findAllActionByMember" parameterType="String" resultType="com.jk.resource.model.AuthAction">
+
+          select * from es_auth_action  where actid in (
+              select authid from  es_role_auth where roleid in (
+                  select roleid from es_user_role  where userid=#{userid}
+               )
+           )
+    </select>
+
+</mapper>
