@@ -1,5 +1,11 @@
 server:
   port: 9001
+spring:
+  rabbitmq:
+     host: localhost
+     port: 5672
+     username: springcloud
+     password: springcloud
 
 feign:
   hystrix:
