@@ -1,0 +1,18 @@
+server:
+  port: 9001
+spring:
+  rabbitmq:
+     host: localhost
+     port: 5672
+     username: springcloud
+     password: springcloud
+
+feign:
+  hystrix:
+    enabled: true
+
+eureka:
+  client:
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka/

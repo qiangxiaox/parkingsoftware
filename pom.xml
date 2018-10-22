@@ -21,6 +21,8 @@
         <module>eureka_config_amqp_server_3344</module>
         <module>bbs_back_service_api</module>
         <module>part_back_powertree_provider_8001</module>
+        <module>shop_common</module>
+        <module>shop_back_service_api</module>
     </modules>
     <packaging>pom</packaging>
 
