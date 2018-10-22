@@ -1,4 +1,4 @@
-package com.jk.eop.resource.model;
+package com.jk.resource.model;
 
 import com.jk.framework.database.DynamicField;
 import com.jk.framework.database.PrimaryKeyField;
@@ -15,7 +15,7 @@ import java.io.Serializable;
  */
 public class AuthAction extends DynamicField implements Serializable{
 
-	private static final long serialVersionUID = -4857392266664309246L;
+	private static final long serialVersionUID = 1840480494125749543L;
 	/**
 	 * 权限点Id
 	 */

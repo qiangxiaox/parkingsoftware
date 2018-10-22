@@ -1,7 +1,7 @@
 package com.jk.framework.util;
 
 import com.alibaba.fastjson.JSON;
-import com.jk.eop.resource.model.AuthAction;
+import com.jk.resource.model.AuthAction;
 import com.jk.framework.database.DynamicField;
 import com.jk.framework.database.NotDbField;
 import com.jk.framework.database.PrimaryKeyField;
@@ -168,10 +168,10 @@ public class ReflectionUtil {
 		return methodName;
 	}
 	
-	public static void main(String[] args){
+	public static void main1(String[] args){
 		//String methodName = "getWidgetList";
 		//System.out.println(getFieldName(methodName));
-		AuthAction action = (AuthAction)newInstance("com.jk.eop.resource.model.AuthAction");
+		AuthAction action = (AuthAction)newInstance("AuthAction");
 		action.setActid(1);
 		action.setChoose(1);
 		action.setName("啦啦啦");
@@ -181,8 +181,10 @@ public class ReflectionUtil {
 		action.addField("我是你的小可爱", "是的，是的");
 
 		Map map = po2Map(action);
+		Map map1 = JSON.parseObject(JSON.toJSONString(action), Map.class);
 		System.out.println(JSON.toJSONString(map));
 		System.out.println(map);
+		System.out.println(map1);
 
 	}
 }

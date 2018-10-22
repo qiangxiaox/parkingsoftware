@@ -1,4 +1,4 @@
-package com.jk.eop.resource.model;
+package com.jk.resource.model;
 
 import com.jk.framework.database.DynamicField;
 import com.jk.framework.database.NotDbField;
@@ -32,10 +32,11 @@ public class AdminUser extends DynamicField implements Serializable {
 	private String userdept;
 	private String remark;
 	private Long dateline;
-	private int[] roleids;
 	private int founder;
 	private Integer siteid; // 子站点id
 
+	//业务字段
+	private int[] roleids;
 	private List<AuthAction> authList; // 此用户的权限点列表
 
 	@PrimaryKeyField
