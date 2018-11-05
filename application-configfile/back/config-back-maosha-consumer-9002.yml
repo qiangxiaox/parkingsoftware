@@ -20,6 +20,15 @@ spring:
     enabled: true
     encoding: UTF-8
     mode: HTML5
+  resources:
+    add-mappings: true
+    cache-period: 3600
+    chain:
+      cache: true
+      enabled: true
+      gzipped: true
+      html-application-cache: true
+    static-locations: /static
 redis:
   host: localhost
   port: 6379
