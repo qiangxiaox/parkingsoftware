@@ -45,21 +45,14 @@
             <version>1.3.2</version>
         </dependency>
 
-        <!--jedis-->
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-        </dependency>
-        <!--api依赖,考虑到可能会回依赖其他模块的api，所以直接依赖总的api即可-->
-        <dependency>
-            <groupId>com.jk</groupId>
-            <artifactId>shop-service-user-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>com.jk</groupId>
             <artifactId>shop-service-miaosha-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jk</groupId>
+            <artifactId>shop_common_redis</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

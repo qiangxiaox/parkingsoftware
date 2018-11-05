@@ -2,6 +2,7 @@ package com.jk.miaosha.controller;
 
 import com.jk.miaosha.RestOrderService;
 import com.jk.miaosha.domain.MiaoshaOrder;
+import com.jk.miaosha.domain.OrderInfo;
 import com.jk.miaosha.result.Result;
 import com.jk.miaosha.service.impl.OrderServiceImpl;
 import com.netflix.discovery.converters.Auto;
@@ -24,5 +25,10 @@ public class RestOrderController implements RestOrderService {
     @Override
     public Result<MiaoshaOrder> getMiaoshaOrderByUserIdAndGoodsId(@RequestParam(value = "userId")long userId,@RequestParam(value = "goodsId") long goodsId) {
         return Result.success(this.orderService.getMiaoshaOrderByUserIdAndGoodsId(userId,goodsId));
+    }
+
+    @Override
+    public Result<OrderInfo> getOrderById(@RequestParam(value = "orderId") long orderId) {
+        return Result.success(this.orderService.getOrderById(orderId));
     }
 }

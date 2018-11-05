@@ -11,5 +11,12 @@
 
     <artifactId>shop-service-user-api</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.jk</groupId>
+            <artifactId>shop_common_shiro</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>

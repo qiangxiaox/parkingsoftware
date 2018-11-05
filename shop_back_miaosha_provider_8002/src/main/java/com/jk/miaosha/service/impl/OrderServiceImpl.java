@@ -36,6 +36,8 @@ public class OrderServiceImpl {
 
     /**
      * 根据用户信息和商品信息创建对应的订单信息和秒杀订单信息
+     * 这里就体现出了分表的好处，如果一个用户发起两个秒杀订单
+     * 那么我们只需要防止miaosha_order中插入同样的两条数据即可，也就是添加唯一索引
      * @param user
      * @param goodsVo
      * @return
@@ -66,5 +68,9 @@ public class OrderServiceImpl {
         this.orderDAO.doCreateMiaoshaOrder(miaoshaOrder);
 
         return orderInfo;
+    }
+
+    public OrderInfo getOrderById(long orderId) {
+        return this.orderDAO.findById(orderId);
     }
 }

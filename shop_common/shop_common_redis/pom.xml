@@ -3,25 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>GradurationProject</artifactId>
+        <artifactId>shop_common</artifactId>
         <groupId>com.jk</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>shop_back_service_api</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>shop-service-user-api</module>
-        <module>shop-service-miaosha-api</module>
-    </modules>
+    <artifactId>shop_common_redis</artifactId>
 
     <dependencies>
-        <!--feign支持-->
+        <!--jedis-->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-feign</artifactId>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
         </dependency>
     </dependencies>
-
 </project>
