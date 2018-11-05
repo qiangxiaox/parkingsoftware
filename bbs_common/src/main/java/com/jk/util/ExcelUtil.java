@@ -27,7 +27,7 @@ public class ExcelUtil {
     }
 
     public static Workbook fillExcelDataWithTemplate(ResultSet rs, String templateFileName)throws Exception{
-        InputStream inp=ExcelUtil.class.getResourceAsStream("/com/java1234/template/"+templateFileName);
+        InputStream inp=ExcelUtil.class.getResourceAsStream("/com/java1234/templates/"+templateFileName);
         POIFSFileSystem fs=new POIFSFileSystem(inp);
         Workbook wb=new HSSFWorkbook(fs);
         Sheet sheet=wb.getSheetAt(0);

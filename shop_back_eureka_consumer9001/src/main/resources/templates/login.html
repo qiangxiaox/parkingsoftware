@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>Insert title here</title>
+</head>
+<body>
+      <form action="" th:action="@{/shiroLogin}" method="post">
+          <!--shiro 默认的用户名 密码 格式为  username  password -->
+          <div th:text="${msg}"></div>
+           用户名：<input type="text" name="username"/><br/>
+           密&nbsp;码：<input type="password" name="password"/><br/>
+           记住我：<input type="checkbox" name="rememberMe" th:value="true"/>记住密码<br/>
+           <input type="submit" value="登录"/>
+      </form>
+</body>
+</html>

@@ -22,6 +22,7 @@ info:
 #  routes:
 #    mydept.serviceId: microservicecloud-dept
 #    mydept.path: /mydept/**
+#这里的路由解释：mydept是自己定义的路由名称，而在这个路由下满足/mydept/** 映射的请求转发到microservicecloud-dept服务中
   #ignored-services: microservicecloud-dept
   #ignored-services: microservicecloud-dept
   #prefix: /atguigu

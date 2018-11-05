@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: config-back-maosha-consumer-9002

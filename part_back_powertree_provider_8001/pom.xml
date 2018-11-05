@@ -12,54 +12,46 @@
     <artifactId>part_back_powertree_provider_8001</artifactId>
 
     <dependencies>
-        <!--
-            SpringCloud Bus apqp配置,如果/bus/refresh在config server中执行，那么这里只需要加pom文件即可，不需要其他配置
-            只在要发送/bus/refresh命令的项目中配置RabbitMQ的配置项
-        -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-bus-amqp</artifactId>
-        </dependency>
-        <!-- SpringCloudConfig配置 -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-        </dependency>
-        <!--  hystrix -->
+        <!--&lt;!&ndash;  hystrix &ndash;&gt;
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-hystrix</artifactId>
-        </dependency>
-        <!--启用自动重试功能之后要加入spring-retry，spring-boot-starter-aop两个jar包-->
-        <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!--eureka 客户端-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-eureka</artifactId>
-        </dependency>
+        </dependency>-->
         <!--api依赖-->
         <dependency>
             <groupId>com.jk</groupId>
-            <artifactId>shop_back_service_api</artifactId>
+            <artifactId>shop-service-user-api</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-feign</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--陈教授版的分页处理启动器-->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
             <version>1.2.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.30</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.1.10</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>1.3.0</version>
         </dependency>
     </dependencies>
 </project>

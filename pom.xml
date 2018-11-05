@@ -23,6 +23,9 @@
         <module>part_back_powertree_provider_8001</module>
         <module>shop_common</module>
         <module>shop_back_service_api</module>
+        <module>shop_back_eureka_consumer9001</module>
+        <module>shop_back_miaosha_provider_8002</module>
+        <module>shop_back_eureka_miaosha_consumer9002</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -39,6 +42,14 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>Dalston.SR1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>1.5.3.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Insert title here</title>
+</head>
+<body>
+   //hasPermission 是否拥有权限 拥有则展示此HTML按钮 未拥有则不展示
+   <a shiro:hasPermission="user:add" href="#">新增用户</a>
+   <a shiro:hasPermission="user:delete"  href="#">删除用户</a>
+</body>
+</html>

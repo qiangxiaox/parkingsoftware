@@ -27,7 +27,15 @@ public class AdminuserServiceImpl implements IRestAdminuserService {
     private IAdminUserDAO adminUserDAO;
 
     @Override
-    public AdminUser getUsesInfoByUsername(String username) {
+    public AdminUser getUsesInfoByUsername(String username) throws Exception{
         return this.adminUserDAO.findById(username);
+    }
+
+    @Override
+    public Map<String, Object> listByAdminUser(String userid) throws Exception {
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("allRoles", this.adminUserDAO.findAllRoleByMember(userid));
+        map.put("allActions", this.adminUserDAO.findAllActionByMember(userid));
+        return map;
     }
 }
