@@ -3,6 +3,7 @@ package com.jk.miaosha.controller;
 import com.jk.miaosha.RestMiaoshaService;
 import com.jk.miaosha.domain.MiaoshaUser;
 import com.jk.miaosha.domain.OrderInfo;
+import com.jk.miaosha.result.Result;
 import com.jk.miaosha.service.impl.MiaoshaServiceImpl;
 import com.jk.miaosha.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,12 @@ public class RestMiaoshaController implements RestMiaoshaService {
     private MiaoshaServiceImpl miaoshaService;
 
     @Override
-    public OrderInfo doMiaosha(@RequestParam("userId") long userId, @RequestBody GoodsVo goodsVo) {
-        return this.miaoshaService.doMiaosha(userId, goodsVo);
+    public Result<OrderInfo> doMiaosha(@RequestParam("userId") long userId, @RequestBody GoodsVo goodsVo) {
+        return Result.success(this.miaoshaService.doMiaosha(userId, goodsVo));
+    }
+
+    @Override
+    public Result<Long> getMiaoshaResult(@RequestParam("userId")long userId,@RequestParam("goodsId") long goodsId) {
+        return Result.success(miaoshaService.getMiaoshaResult(userId, goodsId));
     }
 }

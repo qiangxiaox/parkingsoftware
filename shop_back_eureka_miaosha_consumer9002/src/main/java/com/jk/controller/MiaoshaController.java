@@ -6,10 +6,14 @@ import com.jk.miaosha.domain.OrderInfo;
 import com.jk.miaosha.result.CodeMsg;
 import com.jk.miaosha.result.Result;
 import com.jk.miaosha.vo.GoodsVo;
+import com.jk.rabbitmq.miaosha.MQSender;
+import com.jk.rabbitmq.miaosha.MiaoshaMessage;
 import com.jk.redis.RedisTools;
+import com.jk.redis.key.GoodsKey;
 import com.jk.service.IGoodsService;
 import com.jk.service.IMiaoshaService;
 import com.jk.service.IOrderService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,16 +22,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
- * @ClassName : MiaoshaController
- * @Author : xiaoqiang
- * @Date : 2018/11/5 14:22:22
- * @Description :
- * @Version ： 1.0
+ *
+ *覆写InitializingBean 中的afterPropertiesSet()方法，在系统初始化的时候加载一些内容
  */
 @Controller
 @RequestMapping("/miaosha")
-public class MiaoshaController {
+public class MiaoshaController implements InitializingBean {
 
     @Autowired
     private RedisTools redisTools;
@@ -37,36 +41,27 @@ public class MiaoshaController {
     private IGoodsService goodsService;
     @Autowired
     private IOrderService orderService;
+    @Autowired
+    MQSender sender;
 
-    @RequestMapping("/do_miaosha")
-    public String doMiaosha(Model model,MiaoshaUser user,
-                            @RequestParam("goodsId") long goodsId) {
-        if(user == null){
-            return "login";
+    /**内存标记，标记是否还有库存，标记key=goodsId,value=true,false,某商品是否还有秒杀库存**/
+    private HashMap<Long, Boolean> localOverMap =  new HashMap<Long, Boolean>();
+
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Result<List<GoodsVo>> allGoodsVOResult = this.goodsService.getAllGoodsVO();
+        List<GoodsVo> goodsVoList = allGoodsVOResult.getData();
+        if(goodsVoList == null){
+            return ;
         }
-        model.addAttribute("user", user);
-        Result<GoodsVo> goodsVoResult = this.goodsService.getGoodsVOById(goodsId);
-        GoodsVo goods = goodsVoResult.getData();
-        int miaoshastock = goods.getStockCount();
-    //1.判断秒杀库存量
-        if(miaoshastock <= 0){
-            model.addAttribute("errmsg", CodeMsg.MIAO_SHA_OVER.getMsg());
-            return "miaosha_fail";
+    //系统初始化时，将秒杀商品的库存放到mq中
+        for(GoodsVo goodsVo : goodsVoList){
+            this.redisTools.set(GoodsKey.getMiaoshaGoodsStock, ""+goodsVo.getId(), goodsVo.getStockCount());
+            localOverMap.put(goodsVo.getId(), false);
         }
-    //2.判断是否秒杀过
-        Result<MiaoshaOrder> orderResult = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(),goodsId);
-        MiaoshaOrder order = orderResult.getData();
-        if(order != null){
-            model.addAttribute("errmsg", CodeMsg.REPEATE_MIAOSHA.getMsg());
-            return "miaosha_fail";
-        }
-    //3.减库存 下订单 写入秒杀订单
-        OrderInfo  orderInfo = miaoshaService.doMiaosha(user.getId(),goods);
-    //4.将下好的订单传回到页面中
-        model.addAttribute("goods", goods);
-        model.addAttribute("orderInfo",orderInfo);
-        return "order_detail";
     }
+
     /**
      *  GET POST有什么区别？
      *  Get  操作是幂等，发多次请求服务器执行结果一样，比如查询
@@ -77,27 +72,54 @@ public class MiaoshaController {
      * */
     @RequestMapping(value = "/domiaosha",method = RequestMethod.POST)
     @ResponseBody
-    public Result<OrderInfo> doMiaosha2(Model model,MiaoshaUser user,
+    public Result<Integer> doMiaosha2(Model model,MiaoshaUser user,
                             @RequestParam("goodsId") long goodsId) {
         model.addAttribute("user", user);
         if(user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
         }
-        //判断库存
-        Result<GoodsVo> goodsVoResult= goodsService.getGoodsVOById(goodsId);//10个商品，①此时一个用户发起两个请求，req1 req2
-        GoodsVo goods = goodsVoResult.getData();
-        int stock = goods.getStockCount();
-        if(stock <= 0) {
+
+        //内存标记，减少redis访问
+        boolean over = localOverMap.get(goodsId);
+        if(over) {
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
-        //判断是否已经秒杀到了，(②两个请求req1,req2判断，发现都没有秒杀到)
+    //预减库存
+        Long stock = this.redisTools.decr(GoodsKey.getMiaoshaGoodsStock, "" + goodsId);
+        if(stock <= 0){
+            localOverMap.put(goodsId, true);
+            return Result.error(CodeMsg.MIAO_SHA_OVER);
+        }
+
+    //判断是否已经秒杀到了，(②两个请求req1,req2判断，发现都没有秒杀到)
         Result<MiaoshaOrder> MiaoshaOrderResult = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId);
         MiaoshaOrder order = MiaoshaOrderResult.getData();
         if(order != null) {
             return Result.error(CodeMsg.REPEATE_MIAOSHA);
         }
-        //减库存 下订单 写入秒杀订单  (③两个请求同时发起该操作)，于是超卖现象产生了
-        OrderInfo orderInfo = miaoshaService.doMiaosha(user.getId(),goods);
-        return Result.success(orderInfo);
+    //入队
+        MiaoshaMessage mm = new MiaoshaMessage();
+        mm.setUser(user);
+        mm.setGoodsId(goodsId);
+        sender.sendMiaoshaMessage(mm);
+
+    //返回结果
+        return Result.success(0);//排队中
+    }
+
+    /**
+     * orderId：成功
+     * -1：秒杀失败
+     * 0： 排队中
+     * */
+    @RequestMapping(value="/result", method=RequestMethod.GET)
+    @ResponseBody
+    public Result<Long> miaoshaResult(Model model,MiaoshaUser user,
+                                      @RequestParam("goodsId")long goodsId) {
+        model.addAttribute("user", user);
+        if(user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        return miaoshaService.getMiaoshaResult(user.getId(), goodsId);
     }
 }

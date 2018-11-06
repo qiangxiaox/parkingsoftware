@@ -2,9 +2,10 @@ package com.jk.miaosha.service.impl;
 
 import com.jk.miaosha.dao.IOrderDAO;
 import com.jk.miaosha.domain.MiaoshaOrder;
-import com.jk.miaosha.domain.MiaoshaUser;
 import com.jk.miaosha.domain.OrderInfo;
 import com.jk.miaosha.vo.GoodsVo;
+import com.jk.redis.RedisTools;
+import com.jk.redis.key.OrderKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +23,8 @@ import java.util.Date;
 public class OrderServiceImpl {
     @Autowired
     private IOrderDAO orderDAO;
-
+    @Autowired
+    private RedisTools redisTools;
 
     /**
      * 根据用户Id和商品Id查询该用户是否存在有MiaoshaOrder订单数据
@@ -31,7 +33,8 @@ public class OrderServiceImpl {
      * @return
      */
     public MiaoshaOrder getMiaoshaOrderByUserIdAndGoodsId(long userId, long goodsId) {
-        return this.orderDAO.findMiaoshaOrderByUserIdAndGoodsId(userId,goodsId);
+       return  redisTools.get(OrderKey.getMiaoshaOrderByUidGid, ""+userId+"_"+goodsId, MiaoshaOrder.class);
+        //return this.orderDAO.findMiaoshaOrderByUserIdAndGoodsId(userId,goodsId);
     }
 
     /**
@@ -57,15 +60,20 @@ public class OrderServiceImpl {
         orderInfo.setDeliveryAddrId(0L);
         orderInfo.setStatus(0);
         orderInfo.setUserId(userId);
+        this.orderDAO.doCreateOrder(orderInfo);
+      //这样取值得到的是SQL执行的个数，并不是id long orderId =  this.orderDAO.doCreateOrder(orderInfo);
+    //获取sql执行完之后的ID，则需要调用对象的方式来获取,之前能成功，是因为id为1
 
-       long orderId =  this.orderDAO.doCreateOrder(orderInfo);
+
         //2.创建秒杀订单
         MiaoshaOrder miaoshaOrder = new MiaoshaOrder();
         miaoshaOrder.setGoodsId(goodsVo.getId());
-        miaoshaOrder.setOrderId(orderId);
+        miaoshaOrder.setOrderId(orderInfo.getId());
         miaoshaOrder.setUserId(userId);
 
         this.orderDAO.doCreateMiaoshaOrder(miaoshaOrder);
+    //将订单存入缓存
+        redisTools.set(OrderKey.getMiaoshaOrderByUidGid, ""+userId+"_"+goodsVo.getId(), miaoshaOrder);
 
         return orderInfo;
     }

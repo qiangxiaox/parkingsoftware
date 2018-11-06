@@ -28,4 +28,7 @@ public class GoodsKey  extends BasePrefix {
     public static GoodsKey getGoodsList = new GoodsKey(PAGE_EXPIRE, "golist");
     /**商品详情页面的缓存key，因为不同的商品有不同的详情，所以在set、get中需要加key**/
     public static GoodsKey getGoodsDetail = new GoodsKey(PAGEURL_EXPIRE, "godetail");
+
+    public static GoodsKey getMiaoshaGoodsStock = new GoodsKey(0, "goodstock");
+
 }
