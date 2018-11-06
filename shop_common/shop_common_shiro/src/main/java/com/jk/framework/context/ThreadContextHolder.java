@@ -59,9 +59,9 @@ public class ThreadContextHolder  {
 	}
 
 //	public static void destorySessionContext() {
-//		WebSessionContext context = SessionThreadLocalHolder.get();
-//		if (context != null) {
-//			context.destory();
+//		WebSessionContext usercontext = SessionThreadLocalHolder.get();
+//		if (usercontext != null) {
+//			usercontext.destory();
 //		}
 //	}
 

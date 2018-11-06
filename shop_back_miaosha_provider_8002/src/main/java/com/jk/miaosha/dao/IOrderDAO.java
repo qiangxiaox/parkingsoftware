@@ -2,10 +2,7 @@ package com.jk.miaosha.dao;
 
 import com.jk.miaosha.domain.MiaoshaOrder;
 import com.jk.miaosha.domain.OrderInfo;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectKey;
+import org.apache.ibatis.annotations.*;
 
 public interface IOrderDAO {
 
@@ -44,4 +41,10 @@ public interface IOrderDAO {
      */
     @Select("select * from order_info where id = #{orderId}")
     public OrderInfo findById(@Param("orderId") long orderId);
+
+    @Delete("DELETE FROM order_info WHERE 1=1")
+    public void doRemoveAllOrders();
+
+    @Delete("DELETE FROM miaosha_order WHERE 1=1")
+    public void doRemoveAllMiaoshaOrders();
 }

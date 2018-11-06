@@ -81,4 +81,10 @@ public class OrderServiceImpl {
     public OrderInfo getOrderById(long orderId) {
         return this.orderDAO.findById(orderId);
     }
+
+    public void deleteOrders() {
+        this.orderDAO.doRemoveAllOrders();
+        this.orderDAO.doRemoveAllMiaoshaOrders();
+
+    }
 }

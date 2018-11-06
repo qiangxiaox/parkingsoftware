@@ -3,12 +3,16 @@ package com.jk.miaosha.service.impl;
 import com.jk.miaosha.domain.MiaoshaOrder;
 import com.jk.miaosha.domain.MiaoshaUser;
 import com.jk.miaosha.domain.OrderInfo;
+import com.jk.miaosha.util.MD5Util;
+import com.jk.miaosha.util.UUIDUtil;
 import com.jk.miaosha.vo.GoodsVo;
 import com.jk.redis.RedisTools;
 import com.jk.redis.key.MiaoshaKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @ClassName : MiaoshaServiceImpl
@@ -59,13 +63,36 @@ public class MiaoshaServiceImpl {
             }
         }
     }
-
-    private void setGoodsOver(Long goodsId) {
-        redisTools.set(MiaoshaKey.isGoodsOver, ""+goodsId, true);
+    /**设置redis中的秒杀商品的已结束**/
+    private void setGoodsOver(Long mioashaGoodsId) {
+        redisTools.set(MiaoshaKey.isGoodsOver, ""+mioashaGoodsId, true);
     }
-
+    /**获取redis中的秒杀商品的活动是否结束**/
     private boolean getGoodsOver(long goodsId) {
         return redisTools.exists(MiaoshaKey.isGoodsOver, ""+goodsId);
     }
 
+    /**重置数据库秒杀订单和订单**/
+    public void reset(List<GoodsVo> goodsList) {
+        this.goodsService.resetStock(goodsList);
+        this.orderService.deleteOrders();
+    }
+
+
+    public boolean checkPath(MiaoshaUser user, long goodsId, String path) {
+        if(user == null || path == null) {
+            return false;
+        }
+        String pathOld = redisTools.get(MiaoshaKey.getMiaoshaPath, ""+user.getId() + "_"+ goodsId, String.class);
+        return path.equals(pathOld);
+    }
+
+    public String createMiaoshaPath(MiaoshaUser user, long goodsId) {
+        if(user == null || goodsId <=0) {
+            return null;
+        }
+        String str = MD5Util.md5(UUIDUtil.uuid()+"123456");
+        redisTools.set(MiaoshaKey.getMiaoshaPath, ""+user.getId() + "_"+ goodsId, str);
+        return str;
+    }
 }

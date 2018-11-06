@@ -41,4 +41,10 @@ public class GoodsServiceImpl {
     public int reduceMiaoshaGoodsStock(long goodsId){
         return this.miaoshaGoodsDAO.doUpdateMiaoshaGoodsStock(goodsId);
     }
+
+    public void resetStock(List<GoodsVo> goodsList) {
+        for (GoodsVo goodsVo : goodsList){
+            this.miaoshaGoodsDAO.doUpdateStock(goodsVo.getStockCount(), goodsVo.getId());
+        }
+    }
 }

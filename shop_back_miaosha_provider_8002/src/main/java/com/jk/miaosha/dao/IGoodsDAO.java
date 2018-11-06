@@ -39,4 +39,6 @@ public interface IGoodsDAO {
     @Update("UPDATE miaosha_goods SET stock_count = stock_count - 1 WHERE goods_id = #{goodsId} AND stock_count > 0")
     public int doUpdateMiaoshaGoodsStock(@Param(value = "goodsId") long goodsId);
 
+    @Update("UPDATE miaosha_goods SET stock_count = #{goodsStock} WHERE goods_id = #{goodsId}")
+    public void doUpdateStock(@Param("goodsStock") int goodsStock,@Param("goodsId") long goodsId);
 }

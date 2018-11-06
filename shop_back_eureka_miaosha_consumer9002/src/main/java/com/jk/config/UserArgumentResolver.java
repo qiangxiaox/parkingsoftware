@@ -2,6 +2,7 @@ package com.jk.config;
 
 import com.jk.cookie.CookieUtil;
 import com.jk.miaosha.domain.MiaoshaUser;
+import com.jk.miaosha.usercontext.UserContext;
 import com.jk.redis.RedisTools;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,36 +52,8 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
      */
     @Override
     public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
-        HttpServletRequest request = (HttpServletRequest) nativeWebRequest.getNativeRequest();
-        HttpServletResponse response = (HttpServletResponse) nativeWebRequest.getNativeResponse();
-
-        String paramToken = request.getParameter(CookieUtil.COOKI_NAME_TOKEN);
-        String cookieToken = getCookieValue(request,CookieUtil.COOKI_NAME_TOKEN);
-
-        if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)){
-            return null;
-        }
-        String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
-
-        return CookieUtil.getByToken(redisTools, response, token);
+        return UserContext.getUserHolder();
     }
 
-    /**
-     * 获取Cookie中对应cookiNameToken值的Cookie并返回其value值
-     * @param request
-     * @param cookiNameToken
-     * @return
-     */
-    private String getCookieValue(HttpServletRequest request, String cookiNameToken) {
-        Cookie[] cookies = request.getCookies();
-        if(cookies == null || cookies.length <= 0){
-            return null;
-        }
-        for (Cookie cookie : cookies){
-            if(cookiNameToken.equals(cookie.getName())){
-                return cookie.getValue();
-            }
-        }
-        return null;
-    }
+
 }

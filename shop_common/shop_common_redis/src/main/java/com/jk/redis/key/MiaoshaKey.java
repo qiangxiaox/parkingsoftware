@@ -11,9 +11,11 @@ import com.jk.redis.rediskey.BasePrefix;
  */
 public class MiaoshaKey extends BasePrefix {
 
-    private MiaoshaKey(String prefix) {
-        super(prefix);
+    public MiaoshaKey(int expireSeconds, String prefix) {
+        super(expireSeconds, prefix);
     }
     /**秒杀是否结束的标志**/
-    public static MiaoshaKey isGoodsOver = new MiaoshaKey("go");
+    public static MiaoshaKey isGoodsOver = new MiaoshaKey(0,"go");
+    /**接口限流的路径缓存**/
+    public static MiaoshaKey getMiaoshaPath = new MiaoshaKey(60, "mp");
 }

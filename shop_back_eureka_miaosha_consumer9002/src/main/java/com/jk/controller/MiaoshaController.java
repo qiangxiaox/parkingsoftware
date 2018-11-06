@@ -1,5 +1,6 @@
 package com.jk.controller;
 
+import com.jk.access.AccessLimit;
 import com.jk.miaosha.domain.MiaoshaOrder;
 import com.jk.miaosha.domain.MiaoshaUser;
 import com.jk.miaosha.domain.OrderInfo;
@@ -10,6 +11,8 @@ import com.jk.rabbitmq.miaosha.MQSender;
 import com.jk.rabbitmq.miaosha.MiaoshaMessage;
 import com.jk.redis.RedisTools;
 import com.jk.redis.key.GoodsKey;
+import com.jk.redis.key.MiaoshaKey;
+import com.jk.redis.key.OrderKey;
 import com.jk.service.IGoodsService;
 import com.jk.service.IMiaoshaService;
 import com.jk.service.IOrderService;
@@ -17,11 +20,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 
@@ -70,13 +71,19 @@ public class MiaoshaController implements InitializingBean {
      *      在实际的开发中，秒杀到订单之后肯定会由验证码防止一个用户发起两次秒杀请求
      *      但是为了防止超卖发生，最好还是在数据库中添加唯一索引，当插入相同的数据时，报错，则事务回滚
      * */
-    @RequestMapping(value = "/domiaosha",method = RequestMethod.POST)
+    @RequestMapping(value = "/{path}/domiaosha",method = RequestMethod.POST)
     @ResponseBody
     public Result<Integer> doMiaosha2(Model model,MiaoshaUser user,
-                            @RequestParam("goodsId") long goodsId) {
+                            @RequestParam("goodsId") long goodsId,
+                            @PathVariable("path") String path) {
         model.addAttribute("user", user);
         if(user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
+        }
+    //验证路径是否存在
+        boolean check = this.miaoshaService.checkPath(user, goodsId, path).getData();
+        if(!check){ //设置请求为不合法
+            return Result.error(CodeMsg.REQUEST_ILLEGAL);
         }
 
         //内存标记，减少redis访问
@@ -108,6 +115,7 @@ public class MiaoshaController implements InitializingBean {
     }
 
     /**
+     * 查询秒杀结果
      * orderId：成功
      * -1：秒杀失败
      * 0： 排队中
@@ -122,4 +130,44 @@ public class MiaoshaController implements InitializingBean {
         }
         return miaoshaService.getMiaoshaResult(user.getId(), goodsId);
     }
+
+    /**
+     * 重置数据库和缓存
+     * @param model
+     * @return
+     */
+    @RequestMapping(value="/reset", method=RequestMethod.GET)
+    @ResponseBody
+    public Result<Boolean> reset(Model model) {
+        Result<List<GoodsVo>> allGoodsVOResult = this.goodsService.getAllGoodsVO();
+        List<GoodsVo> goodsList = allGoodsVOResult.getData();
+        for(GoodsVo goods : goodsList) {
+            goods.setStockCount(10);
+            redisTools.set(GoodsKey.getMiaoshaGoodsStock, ""+goods.getId(), 10);
+            localOverMap.put(goods.getId(), false);
+        }
+        redisTools.delete(OrderKey.getMiaoshaOrderByUidGid);
+        redisTools.delete(MiaoshaKey.isGoodsOver);
+        miaoshaService.doMiaoshaReset(goodsList);
+        return Result.success(true);
+    }
+
+    /**
+     * 获取路径，并限制路径在seconds秒内能访问的maxCount次数，以及是否需要登录
+     * @param request
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @AccessLimit(seconds=5, maxCount=5, needLogin=true)
+    @RequestMapping(value="/path", method=RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getMiaoshaPath(MiaoshaUser user, @RequestParam("goodsId")long goodsId) {
+        if(user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        String path = miaoshaService.createMiaoshaPath(user, goodsId).getData();
+        return Result.success(path);
+    }
+
 }

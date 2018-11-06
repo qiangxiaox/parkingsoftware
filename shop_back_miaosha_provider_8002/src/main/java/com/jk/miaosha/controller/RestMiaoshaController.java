@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * @ClassName : RestMiaoshaController
  * @Author : xiaoqiang
@@ -31,5 +33,21 @@ public class RestMiaoshaController implements RestMiaoshaService {
     @Override
     public Result<Long> getMiaoshaResult(@RequestParam("userId")long userId,@RequestParam("goodsId") long goodsId) {
         return Result.success(miaoshaService.getMiaoshaResult(userId, goodsId));
+    }
+
+    @Override
+    public Result<Boolean> doMiaoshaReset(@RequestBody List<GoodsVo> goodsVoList) {
+        this.miaoshaService.reset(goodsVoList);
+        return Result.success(true);
+    }
+
+    @Override
+    public Result<String> createMiaoshaPath(@RequestBody MiaoshaUser user,@RequestParam("goodsId") long goodsId) {
+        return Result.success(this.miaoshaService.createMiaoshaPath(user, goodsId));
+    }
+
+    @Override
+    public Result<Boolean> checkPath(@RequestBody MiaoshaUser user,@RequestParam("goodsId") long goodsId,@RequestParam("path") String path) {
+        return Result.success(this.miaoshaService.checkPath(user, goodsId, path));
     }
 }
