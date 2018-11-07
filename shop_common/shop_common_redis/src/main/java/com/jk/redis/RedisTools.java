@@ -85,6 +85,8 @@ public class RedisTools {
             return "" + objectValue;
         }else if (clazz == String.class){
             return (String)objectValue;
+        }else if (clazz == boolean.class || clazz == Boolean.class) {
+            return "" + objectValue;
         }else{
             return JSON.toJSONString(objectValue);
         }
@@ -105,6 +107,8 @@ public class RedisTools {
             return (T)Double.valueOf(value);
         }else if (clazz == String.class){
             return (T)value;
+        }else if(clazz == boolean.class || clazz == Boolean.class){
+            return (T)Boolean.valueOf(value);
         }else{
             //return JSON.parseObject(value, clazz);
             return JSON.toJavaObject(JSON.parseObject(value),clazz);

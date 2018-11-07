@@ -64,12 +64,13 @@ public class MiaoshaServiceImpl {
         }
     }
     /**设置redis中的秒杀商品的已结束**/
-    private void setGoodsOver(Long mioashaGoodsId) {
+    private void setGoodsOver(long mioashaGoodsId) {
         redisTools.set(MiaoshaKey.isGoodsOver, ""+mioashaGoodsId, true);
     }
     /**获取redis中的秒杀商品的活动是否结束**/
     private boolean getGoodsOver(long goodsId) {
-        return redisTools.exists(MiaoshaKey.isGoodsOver, ""+goodsId);
+        Boolean goodsover = this.redisTools.get(MiaoshaKey.isGoodsOver, "" + goodsId, boolean.class);
+        return goodsover;
     }
 
     /**重置数据库秒杀订单和订单**/

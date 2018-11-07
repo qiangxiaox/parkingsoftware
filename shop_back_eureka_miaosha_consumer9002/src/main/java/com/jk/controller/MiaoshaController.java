@@ -51,17 +51,59 @@ public class MiaoshaController implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Result<List<GoodsVo>> allGoodsVOResult = this.goodsService.getAllGoodsVO();
-        List<GoodsVo> goodsVoList = allGoodsVOResult.getData();
+        List<GoodsVo> goodsVoList= this.goodsService.getAllGoodsVO().getData();
         if(goodsVoList == null){
             return ;
         }
     //系统初始化时，将秒杀商品的库存放到mq中
         for(GoodsVo goodsVo : goodsVoList){
+            //设置每件商品的秒杀库存
             this.redisTools.set(GoodsKey.getMiaoshaGoodsStock, ""+goodsVo.getId(), goodsVo.getStockCount());
+            //设置每件商品的秒杀状态，初始为false
+            this.redisTools.set(MiaoshaKey.isGoodsOver, ""+goodsVo.getId(), false);
             localOverMap.put(goodsVo.getId(), false);
         }
     }
+
+    @AccessLimit(seconds=1, maxCount=5000, needLogin=true)
+    @RequestMapping(value = "/domiaosha",method = RequestMethod.GET)
+    @ResponseBody
+    public Result<Integer> doMiaosha(Model model,MiaoshaUser user,
+                                      @RequestParam("goodsId") long goodsId
+                                      ) {
+        model.addAttribute("user", user);
+        if(user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+
+        //内存标记，减少redis访问
+        boolean over = localOverMap.get(goodsId);
+        if(over) {
+            return Result.error(CodeMsg.MIAO_SHA_OVER);
+        }
+        //判断是否已经秒杀到了，(②两个请求req1,req2判断，发现都没有秒杀到)
+        MiaoshaOrder order = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId).getData();
+        if(order != null) {
+            return Result.error(CodeMsg.REPEATE_MIAOSHA);
+        }
+
+        //预减库存
+        Long stock = this.redisTools.decr(GoodsKey.getMiaoshaGoodsStock, "" + goodsId);
+        if(stock <= 0){
+            localOverMap.put(goodsId, true);
+            return Result.error(CodeMsg.MIAO_SHA_OVER);
+        }
+
+        //入队
+        MiaoshaMessage mm = new MiaoshaMessage();
+        mm.setUser(user);
+        mm.setGoodsId(goodsId);
+        sender.sendMiaoshaMessage(mm);
+
+        //返回结果
+        return Result.success(0);//排队中
+    }
+
 
     /**
      *  GET POST有什么区别？
@@ -91,6 +133,12 @@ public class MiaoshaController implements InitializingBean {
         if(over) {
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
+    //判断是否已经秒杀到了，(②两个请求req1,req2判断，发现都没有秒杀到)
+        MiaoshaOrder order = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId).getData();
+        if(order != null) {
+            return Result.error(CodeMsg.REPEATE_MIAOSHA);
+        }
+
     //预减库存
         Long stock = this.redisTools.decr(GoodsKey.getMiaoshaGoodsStock, "" + goodsId);
         if(stock <= 0){
@@ -98,12 +146,6 @@ public class MiaoshaController implements InitializingBean {
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
 
-    //判断是否已经秒杀到了，(②两个请求req1,req2判断，发现都没有秒杀到)
-        Result<MiaoshaOrder> MiaoshaOrderResult = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId);
-        MiaoshaOrder order = MiaoshaOrderResult.getData();
-        if(order != null) {
-            return Result.error(CodeMsg.REPEATE_MIAOSHA);
-        }
     //入队
         MiaoshaMessage mm = new MiaoshaMessage();
         mm.setUser(user);
@@ -145,9 +187,9 @@ public class MiaoshaController implements InitializingBean {
             goods.setStockCount(10);
             redisTools.set(GoodsKey.getMiaoshaGoodsStock, ""+goods.getId(), 10);
             localOverMap.put(goods.getId(), false);
+            this.redisTools.set(MiaoshaKey.isGoodsOver, ""+goods.getId(), false);
         }
-        redisTools.delete(OrderKey.getMiaoshaOrderByUidGid);
-        redisTools.delete(MiaoshaKey.isGoodsOver);
+        this.redisTools.delete(OrderKey.getMiaoshaOrderByUidGid);
         miaoshaService.doMiaoshaReset(goodsList);
         return Result.success(true);
     }

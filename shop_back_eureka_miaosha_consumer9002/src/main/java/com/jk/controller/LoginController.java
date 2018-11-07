@@ -44,7 +44,7 @@ public class LoginController {
 
     @RequestMapping("/do_login")
     @ResponseBody
-    public Result<Boolean> doLogin(HttpServletResponse response,@Valid LoginVo loginVo) {
+    public Result<String> doLogin(HttpServletResponse response,@Valid LoginVo loginVo) {
         logger.info(loginVo.toString());
     //进行登录判断
       CodeMsg loginMsg = this.miaoshaUserService.login(loginVo);
@@ -53,7 +53,7 @@ public class LoginController {
             //此时登录成功，所以该用户必然存在，所以无需进行非空判断
            Result<MiaoshaUser> userResult = this.miaoshaUserService.getById(loginVo.getMobile());
            CookieUtil.addCookie(redisTools,response, token,userResult.getData());
-           return Result.success(true);
+           return Result.success(token);
        }else{
            return Result.error(loginMsg);
        }

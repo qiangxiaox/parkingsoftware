@@ -34,8 +34,7 @@ public class MQReceiver {
 			MiaoshaUser user = mm.getUser();
 			long goodsId = mm.getGoodsId();
 		//查询库存
-			Result<GoodsVo> goodsVoResult = goodsService.getGoodsVOById(goodsId);
-			GoodsVo goods = goodsVoResult.getData();
+			GoodsVo goods =  goodsService.getGoodsVOById(goodsId).getData();
 			int stock = goods.getStockCount();
 	    	if(stock <= 0) {
 	    		return;
