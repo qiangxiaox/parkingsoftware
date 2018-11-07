@@ -43,7 +43,7 @@ spring:
 redis:
   host: localhost
   port: 6379
-  timeout: 3
+  timeout: 10
   poolMaxTotal: 1000
-  poolMaxIdle: 1000
-  poolMaxWait: 3
+  poolMaxIdle: 500
+  poolMaxWait: 500

@@ -28,8 +28,8 @@ redis:
   port: 6379
   timeout: 3
   poolMaxTotal: 1000
-  poolMaxIdle: 1000
-  poolMaxWait: 3
+  poolMaxIdle: 500
+  poolMaxWait: 500
 
 eureka:
   client: #客户端注册进eureka服务列表内
