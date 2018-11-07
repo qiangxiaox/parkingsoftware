@@ -27,8 +27,8 @@ redis:
   host: localhost
   port: 6379
   timeout: 3
-  poolMaxTotal: 100
-  poolMaxIdle: 100
+  poolMaxTotal: 1000
+  poolMaxIdle: 1000
   poolMaxWait: 3
 
 eureka:
