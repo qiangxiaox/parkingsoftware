@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: config-goods-provider-8005

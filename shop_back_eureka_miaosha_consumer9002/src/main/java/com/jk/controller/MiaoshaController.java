@@ -3,7 +3,6 @@ package com.jk.controller;
 import com.jk.access.AccessLimit;
 import com.jk.miaosha.domain.MiaoshaOrder;
 import com.jk.miaosha.domain.MiaoshaUser;
-import com.jk.miaosha.domain.OrderInfo;
 import com.jk.miaosha.result.CodeMsg;
 import com.jk.miaosha.result.Result;
 import com.jk.miaosha.vo.GoodsVo;
@@ -12,7 +11,7 @@ import com.jk.rabbitmq.miaosha.MiaoshaMessage;
 import com.jk.redis.RedisTools;
 import com.jk.redis.key.GoodsKey;
 import com.jk.redis.key.MiaoshaKey;
-import com.jk.redis.key.OrderKey;
+import com.jk.redis.key.MiaoshaOrderKey;
 import com.jk.service.IGoodsService;
 import com.jk.service.IMiaoshaService;
 import com.jk.service.IOrderService;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 
@@ -82,7 +80,7 @@ public class MiaoshaController implements InitializingBean {
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
         //判断是否已经秒杀到了，(②两个请求req1,req2判断，发现都没有秒杀到)
-        MiaoshaOrder order = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId).getData();
+        MiaoshaOrder order = miaoshaService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId).getData();
         if(order != null) {
             return Result.error(CodeMsg.REPEATE_MIAOSHA);
         }
@@ -134,7 +132,7 @@ public class MiaoshaController implements InitializingBean {
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
     //判断是否已经秒杀到了，(②两个请求req1,req2判断，发现都没有秒杀到)
-        MiaoshaOrder order = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId).getData();
+        MiaoshaOrder order = miaoshaService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId).getData();
         if(order != null) {
             return Result.error(CodeMsg.REPEATE_MIAOSHA);
         }
@@ -189,7 +187,7 @@ public class MiaoshaController implements InitializingBean {
             localOverMap.put(goods.getId(), false);
             this.redisTools.set(MiaoshaKey.isGoodsOver, ""+goods.getId(), false);
         }
-        this.redisTools.delete(OrderKey.getMiaoshaOrderByUidGid);
+        this.redisTools.delete(MiaoshaOrderKey.getMiaoshaOrderByUidGid);
         miaoshaService.doMiaoshaReset(goodsList);
         return Result.success(true);
     }

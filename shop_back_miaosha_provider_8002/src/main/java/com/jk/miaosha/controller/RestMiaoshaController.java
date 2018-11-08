@@ -1,8 +1,10 @@
 package com.jk.miaosha.controller;
 
 import com.jk.miaosha.RestMiaoshaService;
+import com.jk.miaosha.domain.MiaoshaOrder;
 import com.jk.miaosha.domain.MiaoshaUser;
 import com.jk.miaosha.domain.OrderInfo;
+import com.jk.miaosha.result.CodeMsg;
 import com.jk.miaosha.result.Result;
 import com.jk.miaosha.service.impl.MiaoshaServiceImpl;
 import com.jk.miaosha.vo.GoodsVo;
@@ -49,5 +51,16 @@ public class RestMiaoshaController implements RestMiaoshaService {
     @Override
     public Result<Boolean> checkPath(@RequestBody MiaoshaUser user,@RequestParam("goodsId") long goodsId,@RequestParam("path") String path) {
         return Result.success(this.miaoshaService.checkPath(user, goodsId, path));
+    }
+
+    @Override
+    public Result<MiaoshaOrder> getMiaoshaOrderByUserIdAndGoodsId(@RequestParam(value = "userId")long userId, @RequestParam(value = "goodsId") long goodsId) {
+        return Result.success(this.miaoshaService.getMiaoshaOrderByUserIdAndGoodsId(userId,goodsId));
+    }
+
+    @Override
+    public Result<CodeMsg> removeAllMiaoshaOrders() {
+        this.miaoshaService.removeAllMiaoshaOrders();
+        return Result.success(CodeMsg.SUCCESS);
     }
 }

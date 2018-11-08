@@ -26,6 +26,9 @@
         <module>shop_back_eureka_consumer9001</module>
         <module>shop_back_miaosha_provider_8002</module>
         <module>shop_back_eureka_miaosha_consumer9002</module>
+        <module>shop_back_order_provider_8003</module>
+        <module>shop_back_user_provider_8004</module>
+        <module>shop_back_goods_provider_8005</module>
     </modules>
     <packaging>pom</packaging>
 

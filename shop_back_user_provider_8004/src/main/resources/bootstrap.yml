@@ -1,0 +1,11 @@
+spring: 
+  cloud: 
+    config:
+      name: config-user-provider-8004     #需要从github上读取的资源名称，注意没有yml后缀名
+      label: miaosha-optimize
+      uri: http://config-3344.com:3344      #SpringCloudConfig获取的服务地址
+      fail-fast: true #配置优先检测config server工作是否正常，并快速响应失败内容，让失败之后还可以配置自动重试功能
+
+management:
+  security:
+    enabled: false

@@ -1,7 +1,9 @@
 package com.jk.miaosha;
 
+import com.jk.miaosha.domain.MiaoshaOrder;
 import com.jk.miaosha.domain.MiaoshaUser;
 import com.jk.miaosha.domain.OrderInfo;
+import com.jk.miaosha.result.CodeMsg;
 import com.jk.miaosha.result.Result;
 import com.jk.miaosha.vo.GoodsVo;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,5 +58,11 @@ public interface RestMiaoshaService {
      */
     @PostMapping("/miaosha/api/checkPath")
     public Result<Boolean> checkPath(@RequestBody MiaoshaUser user, @RequestParam("goodsId") long goodsId,@RequestParam("path") String path);
+
+    @GetMapping("/order/api/getMiaoshaOrderByUserIdAndGoodsId")
+    public Result<MiaoshaOrder> getMiaoshaOrderByUserIdAndGoodsId(@RequestParam(value = "userId")long userId, @RequestParam(value = "goodsId") long goodsId);
+
+    @GetMapping("/order/api/removeAllMiaoshaOrders")
+    public Result<CodeMsg> removeAllMiaoshaOrders();
 
 }

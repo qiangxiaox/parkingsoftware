@@ -40,7 +40,7 @@ public class MQReceiver {
 	    		return;
 	    	}
 		//判断是否已经秒杀到了,这里是查的redis所以，再次查询也无所谓
-			Result<MiaoshaOrder> orderResult = orderService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId);
+			Result<MiaoshaOrder> orderResult = miaoshaService.getMiaoshaOrderByUserIdAndGoodsId(user.getId(), goodsId);
 			MiaoshaOrder order = orderResult.getData();
 			if(order != null) {
 	    		return;
