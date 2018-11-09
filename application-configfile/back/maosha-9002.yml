@@ -1,3 +1,10 @@
+spring:
+    profiles:
+        active:
+        - dev
+
+---
+
 server:
   port: 9002
 
@@ -12,6 +19,7 @@ eureka:
       defaultZone: http://eureka7001.com:7001/eureka
 
 spring:
+  profiles: dev #开发环境
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
