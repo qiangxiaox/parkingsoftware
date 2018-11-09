@@ -15,11 +15,9 @@
     </properties>
 
     <modules>
-        <module>bbs_common</module>
         <module>eureka_server_registry_7001</module>
         <module>eureka_zuul_gateway_9572</module>
         <module>eureka_config_amqp_server_3344</module>
-        <module>bbs_back_service_api</module>
         <module>part_back_powertree_provider_8001</module>
         <module>shop_common</module>
         <module>shop_back_service_api</module>
@@ -27,8 +25,6 @@
         <module>shop_back_miaosha_provider_8002</module>
         <module>shop_back_eureka_miaosha_consumer9002</module>
         <module>shop_back_order_provider_8003</module>
-        <module>shop_back_user_provider_8004</module>
-        <module>shop_back_goods_provider_8005</module>
     </modules>
     <packaging>pom</packaging>
 
